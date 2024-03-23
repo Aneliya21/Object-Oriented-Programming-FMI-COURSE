@@ -8,11 +8,14 @@ private:
     Song songs[Constants::MAX_SONGS_COUNT];
     size_t currentCount = 0;
 
+
     void swapSongs(Song& s1, Song& s2);
 
     bool isSongInPlaylist(const Song& song) const;
 
     void sortPlaylist(bool(*isLess)(const Song& first, const Song& second));
+
+    int getIndexInListByName(const char* name) const;
 
 public:
 
@@ -23,15 +26,11 @@ public:
 
     void printPlaylist() const;
 
-    int getIndexInListByName(const char* name) const;
-
     void searchByName(const char* name) const;
     void searchByGenre(char ch)  const;
 
-
     void sortByName();
     void sortByDuration();
-
 
     void addRithmToSongByName(const char* name, unsigned bit);
     void mix(const char* first, const char* second);

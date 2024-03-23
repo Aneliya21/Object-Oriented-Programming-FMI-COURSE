@@ -1,4 +1,4 @@
-#include "Playlist.h"
+#include "_Playlist.h"
 
 void Playlist::swapSongs(Song& s1, Song& s2) {
     Song temp = s1;
@@ -115,7 +115,7 @@ void Playlist::mix(const char* first, const char* second) {
     int firstIndex = getIndexInListByName(first);
     int secondIndex = getIndexInListByName(second);
 
-    if (firstIndex == 1 || secondIndex == -1) {
+    if (firstIndex == -1 || secondIndex == -1) {
         return;
     }
 
@@ -130,7 +130,8 @@ void Playlist::mix(const char* first, const char* second) {
 
     size_t index = 0;
     while (index < minContentLen) {
-        tempContent[index++] ^= songs[secondIndex].getContent()[index];
+        tempContent[index] ^= songs[secondIndex].getContent()[index];
+        index++;
     }
 
     if (index + 1 < baseContentLen) {

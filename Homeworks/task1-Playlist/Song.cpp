@@ -1,15 +1,48 @@
 #include "Song.h"
 
-void Song::addRithmToByte(unsigned bit, char& current) {
-    unsigned mask = 0;
-    unsigned iter = 1;
+char* Song::getGenreString() const {
+    char result[Constants::MAX_NAME_LEN + 1] = "";
+    result[Constants::MAX_NAME_LEN] = '\0';
 
-    while (mask <= Constants::MAX_CONTENT_LEN) {
-        mask = AdditionalFunctions::powerOfTwo(iter++);
+    size_t resultLen = 0;
 
-        if (iter % bit == 0) {
+    if ((genre & Genre::Rock) == Genre::Rock) {
+        strcat(result, "Rock&");
+        resultLen += 5;
+    }
+    if ((genre & Genre::Pop) == Genre::Pop) {
+        strcat(result, "Pop&");
+        resultLen += 4;
+    }
+    if ((genre & Genre::Jazz) == Genre::Jazz) {
+        strcat(result, "Jazz&");
+        resultLen += 5;
+    }
+    if ((genre & Genre::HipHop) == Genre::HipHop) {
+        strcat(result, "HipHop&");
+        resultLen += 7;
+    }
+    if ((genre & Genre::Electric) == Genre::Electric) {
+        strcat(result, "Electric&");
+        resultLen += 9;
+    }
+    result[resultLen - 1] = '\0';
+    return result;
+}
+
+
+void Song::addRithmToByte(unsigned bit, char& current, size_t& counter) {
+    unsigned mask = 1;
+
+    while (mask < Constants::MAX_CONTENT_LEN) {
+        
+        if (counter == bit) {          
             current |= mask;
+            counter = 0;
         }
+
+        counter++;        
+        mask <<= 1;
     }
 }
 
@@ -32,7 +65,6 @@ void Song::setDuration(unsigned hours, unsigned mins, unsigned seconds) {
     duration.setMins(mins);
     duration.setSeconds(seconds);
 }
-
 void Song::setGenre(const char* genre) {
     if (!genre || strlen(genre) > 5) {
         return;
@@ -84,18 +116,14 @@ char Song::getGenre() const {
 }
 const char* Song::getContent() const {
     return this->content;
-}
+} 
 
-//0010 1011 | 0110 1001 | 0110 1100 ,2
-    //           
-    //to edit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void Song::addRithm(unsigned bit) {
     size_t contentLen = strlen(content);
-    /*for (size_t i = 0; i < contentLen; i++) {
-        addRithmToByte(bit, content[i]);
-    }*/
+    size_t counter = 1;
+    
     for (int i = contentLen - 1; i >= 0; i--) {
-        addRithmToByte(bit, content[i]);
+        addRithmToByte(bit, content[i], counter);     
     }
 }
 
@@ -130,12 +158,31 @@ void Song::saveSongToFile(std::ofstream& ofs) const {
         return;
     }
     ofs << name << ", " << duration.getHours() << ", " << duration.getMins() << ", "
-        << duration.getSeconds() << ", " << genre << ", " << content << std::endl;;
+        << duration.getSeconds() << ", ";
+    /*if ((genre & Genre::Rock) == Genre::Rock) {
+        ofs << "Rock&";
+    }
+    if ((genre & Genre::Pop) == Genre::Pop) {
+        ofs << "Pop&";
+    }
+    if ((genre & Genre::Jazz) == Genre::Jazz) {
+        ofs << "Jazz&";
+    }
+    if ((genre & Genre::HipHop) == Genre::HipHop) {
+        ofs << "HipHop&";
+    }
+    if ((genre & Genre::Electric) == Genre::Electric) {
+        ofs << "Electric&";
+    }*/
+    char genreString[Constants::MAX_NAME_LEN + 1];
+    strcpy(genreString, getGenreString());
+    ofs << genreString;
+    ofs << ", " << content << std::endl;;
 }
 
 void Song::printGenre() const {
 
-    if ((genre & Genre::Rock) == Genre::Rock) {
+    /*if ((genre & Genre::Rock) == Genre::Rock) {
         std::cout << "Rock&";
     }
     if ((genre & Genre::Pop) == Genre::Pop) {
@@ -149,7 +196,10 @@ void Song::printGenre() const {
     }
     if ((genre & Genre::Electric) == Genre::Electric) {
         std::cout << "Electric&";
-    }
+    }*/
+    char genreString[Constants::MAX_NAME_LEN + 1];
+    strcpy(genreString, getGenreString());
+    std::cout << genreString;
 }
 
 void Song::printSong() const {

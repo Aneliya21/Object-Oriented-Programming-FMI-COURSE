@@ -1,7 +1,11 @@
 #pragma once
+
+#pragma warning (disable:4996)
+
 #include "Time.h"
 
-enum Genre : char {
+//Each genre is a power of two
+enum Genre : char {     //sizeof(Genre) = 1, because it is from type char
     Rock = 1,  //0000 0001
     Pop = 2,  //0000 0010
     Jazz = 4, //0000 0100
@@ -17,7 +21,11 @@ private:
     char genre;
     char content[Constants::MAX_CONTENT_LEN + 1] = "";
 
-    void addRithmToByte(unsigned bit, char& current);
+    void addRithmToByte(unsigned bit, char& current, size_t& counter);
+
+    void printGenre() const;
+
+    char* getGenreString() const;
 
 public:
     Song() = default;
@@ -35,16 +43,11 @@ public:
     char getGenre() const;
     const char* getContent() const;
 
-    //0010 1011 | 0110 1001 | 0110 1100 ,2
-    //           
-    //to edit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     void addRithm(unsigned bit);
 
     char* readContentFromBinaryFile(const char* fileName)  const;
 
     void saveSongToFile(std::ofstream& ofs) const;
-
-    void printGenre() const;
 
     void printSong() const;
 

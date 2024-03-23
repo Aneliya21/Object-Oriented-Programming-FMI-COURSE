@@ -1,9 +1,42 @@
 #include <iostream>
-#include "Playlist.h"
+#include "_Playlist.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    Playlist pl;
+    pl.addToPlaylist("Song 2", 0, 1, 55, "rp", "song2.txt");
+   // pl.addToPlaylist("Song 1", 0, 1, 5, "p", "song1.txt");
+
+    pl.printPlaylist();
+
+    /*pl.printPlaylist();
+
+    std::cout << std::endl;
+
+    pl.sortByName();
+    pl.printPlaylist();
+
+    std::cout << std::endl;
+
+    pl.searchByName("Song 1");
+
+    std::cout << std::endl;
+
+    pl.searchByGenre('r');
+
+    std::cout << std::endl;*/
+
+    //pl.addToPlaylist("Song 3", 0, 2, 33, "h", "file.txt");
+
+    //pl.printPlaylist();
+
+    //pl.addRithmToSongByName("Song 3", 3);
+
+    //pl.serializeSongByNameToBinaryFile("Song 3", "s3.txt");
+     //pl.mix("Song 1", "Song 2");
+
+     pl.serializeSongByNameToBinaryFile("Song 2", "song3.txt");
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
