@@ -1,32 +1,27 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-
-#include "Constants.h"
+#include "Row.h"
 
 #pragma warning (disable:4996)
 
-namespace AdditionalFunciotns {
-    unsigned fromCharToInt(char ch);
-    bool isDigit(char ch);
-    char* handleHTMLcodes(const char* str);
+//namespace AdditionalFunciotns {
+//    unsigned fromCharToInt(char ch);
+//    bool isDigit(char ch);
+//    char* handleHTMLcodes(const char* str);
+//
+//    void printCommands();
+//}
 
-    void printCommands();
-}
-
-typedef char Field[Constants::FIELD_MAX_SIZE + 1];
-
-struct Row {
-    Field fields[Constants::FIELD_MAX_SIZE]{ "" };
-    bool headers[Constants::FIELD_MAX_SIZE]{ false };
-
-    void parseFields(std::ifstream&, const char*, size_t, size_t&, const char*);
-
-    void saveRow(std::ofstream& ofs, size_t currentRowIndex, size_t colsCount) const;
-};
+//typedef char Field[Constants::FIELD_MAX_SIZE + 1];
+//
+//struct Row {
+//    Field fields[Constants::FIELD_MAX_SIZE]{ "" };
+//    bool headers[Constants::FIELD_MAX_SIZE]{ false };
+//
+//    void parseFields(std::ifstream&, const char*, size_t, size_t&, const char*);
+//
+//    void saveRow(std::ofstream& ofs, size_t currentRowIndex, size_t colsCount) const;
+//};
 
 class HTML_table {
 private:
