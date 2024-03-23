@@ -9,42 +9,15 @@
 
 #pragma warning (disable:4996)
 
-//namespace Constants {
-//    constexpr size_t FIELD_MAX_SIZE = 50; //after transf char entity ref
-//    constexpr size_t MAX_FIELDS_ROW = 15;
-//    constexpr size_t MAX_ROWS_SIZE = 100;
-//
-//    constexpr size_t FILE_TO_READ_LENGTH = 64;
-//
-//    const char TH_OPEN_TAG[] = "th";
-//    const char TD_OPEN_TAG[] = "td";
-//
-//    const char TH_CLOSE_TAG[] = "/th";
-//    const char TD_CLOSE_TAG[] = "/td";
-//
-//    const char SEPARATOR_LEFT = '<';
-//    const char SEPARATOR_RIGHT = '>';
-//
-//    //COMMANDS
-//    const char ADD[] = "add";
-//    const char REMOVE[] = "remove";
-//    const char EDIT[] = "edit";
-//    const char PRINT[] = "print";
-//    const char END[] = "end";
-//
-//}
+namespace AdditionalFunciotns {
+    unsigned fromCharToInt(char ch);
+    bool isDigit(char ch);
+    char* handleHTMLcodes(const char* str);
 
-namespace AdditionalFunctions {
-
-    size_t getFileSize(std::ifstream& ifs);
-
-    ////source: https://github.com/Angeld55/Introduction_to_programming_FMI/blob/main/Sem.%2010/search_in_text.cpp
-    //bool isPrefix(const char* pattern, const char* text);
-
-    //bool searchInText(const char* text, const char* pattern);
+    void printCommands();
 }
 
-typedef char Field[Constants::FIELD_MAX_SIZE];
+typedef char Field[Constants::FIELD_MAX_SIZE + 1];
 
 struct Row {
     Field fields[Constants::FIELD_MAX_SIZE]{ "" };
@@ -63,17 +36,13 @@ private:
 
     char fileToReadTable[Constants::FILE_TO_READ_LENGTH];
 
-    size_t getLongestFieldLength() const;
+    size_t getLongestFieldOnColLength(size_t currCol) const;
 
     void swapRows(Row&, Row&);
 
     void shiftRows(size_t);
 
     void printOffsets(size_t) const;
-
-    /*void saveRow(std::ofstream& ofs, size_t currentRowIndex) const;*/
-
-    /*void parseFields(std::ifstream&, const char*, size_t, size_t&, const char*);*/
 
     void parseRows(std::ifstream&, size_t&);
 
@@ -93,7 +62,6 @@ public:
     size_t getRowsCount() const;
     size_t getColsCount() const;
 
-
     void add(size_t rowNumber, const Row& toAdd);
 
     void remove(size_t rowNumber);
@@ -101,7 +69,6 @@ public:
     void edit(size_t rowNumber, size_t colNumber, const char* newValue);
 
     void print()  const;
-
 
     ~HTML_table();
 

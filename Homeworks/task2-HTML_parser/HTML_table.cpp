@@ -1,51 +1,78 @@
 #include "HTML_table.h"
 
-size_t AdditionalFunctions::getFileSize(std::ifstream& ifs) {
-    size_t curr = ifs.tellg();
-    ifs.seekg(0, std::ios::end);
-
-    size_t size = ifs.tellg();
-    ifs.seekg(curr);
-
-    return size;
+unsigned AdditionalFunciotns::fromCharToInt(char ch) {
+    return ch - '0';
 }
-//source: https://github.com/Angeld55/Introduction_to_programming_FMI/blob/main/Sem.%2010/search_in_text.cpp
-//bool AdditionalFunctions::isPrefix(const char* pattern, const char* text) {
-//    while (*text != '\0' && *pattern != '\0') {
-//        if (*text != *pattern)
-//            return false;
-//        text++;
-//        pattern++;
-//    }
-//    return *pattern == '\0';
-//}
-//bool AdditionalFunctions::searchInText(const char* text, const char* pattern) {
-//    size_t textLen = strlen(text);
-//    size_t patternLen = strlen(pattern);
-//    while (patternLen <= textLen) {
-//        if (isPrefix(pattern, text))
-//            return true;
-//        text++; //подминаваме първия символ
-//        textLen--;
-//    }
-//    return false;
-//}
+
+bool AdditionalFunciotns::isDigit(char ch) {
+    return ch >= '0' && ch <= '9';
+}
+
+char* AdditionalFunciotns::handleHTMLcodes(const char* str) {
+    if (!str) {
+        return nullptr;
+    }
+    char result[Constants::FIELD_MAX_SIZE + 1];
+    size_t strLength = strlen(str);
+    result[strLength - 1] = '\0';
+
+    size_t resInd = 0;
+
+    size_t asciiCode = 0;
+
+    while (*str) {
+        if (*str == '&') {
+            str++;
+            if (*str == '#') {
+                str++;
+                while (isDigit(*str)) {
+                    asciiCode *= 10;
+                    asciiCode += AdditionalFunciotns::fromCharToInt(*str);
+                    str++;
+                }
+                result[resInd++] = (char)(asciiCode);
+            }
+        }
+        else {
+            result[resInd++] = *str;
+            str++;
+        }
+    }
+    result[resInd] = '\0';
+    return result;
+}
+
+void AdditionalFunciotns::printCommands() {
+    std::cout << "Commands: " << std::endl;
+    std::cout << '\t' << "> add" << std::endl;
+    std::cout << '\t' << "> remove" << std::endl;
+    std::cout << '\t' << "> edit" << std::endl;
+    std::cout << '\t' << "> print" << std::endl;
+    std::cout << '\t' << "> end" << std::endl;
+}
 
 //Row functions
 void Row::parseFields(std::ifstream& ifs, const char* curr, size_t rowIndex, size_t& cols, const char* closeTag) {
 
-    char buff[Constants::FIELD_MAX_SIZE];
+    char buff[Constants::FIELD_MAX_SIZE + 1];
+    buff[Constants::FIELD_MAX_SIZE] = '\0';
+
     strcpy(buff, curr);
 
     bool isTH = false;
     bool isTD = false;
 
-    char buffClose[Constants::FIELD_MAX_SIZE];
+    char buffClose[Constants::FIELD_MAX_SIZE + 1];
+    buffClose[Constants::FIELD_MAX_SIZE] = '\0';
+
     strcpy(buffClose, closeTag);
 
+    //if it is a header tag
     if (strcmp(curr, Constants::TH_OPEN_TAG) == 0) {
         isTH = true;
     }
+
+    //if it is a field tag
     else if (strcmp(curr, Constants::TD_OPEN_TAG) == 0) {
         isTD = true;
     }
@@ -55,19 +82,22 @@ void Row::parseFields(std::ifstream& ifs, const char* curr, size_t rowIndex, siz
         ifs.getline(buff, Constants::FIELD_MAX_SIZE, Constants::SEPARATOR_LEFT);
 
         if (isTH)
-            //rows[rowIndex].headers[cols] = true;
             headers[cols] = true;
 
         else if (isTD)
-            //rows[rowIndex].headers[cols] = false;
             headers[cols] = false;
 
-        // strcpy(rows[rowIndex].fields[cols++], buff);
-        strcpy(fields[cols++], buff);
+        if (strcmp(buff, "") == 0) {
+            strcpy(fields[cols++], buff);
+        }
+        else {
+            char res[Constants::FIELD_MAX_SIZE + 1] = "";
+            strcpy(res, AdditionalFunciotns::handleHTMLcodes(buff));
+            strcpy(fields[cols++], res);
+        }
 
         ifs.getline(buffClose, Constants::FIELD_MAX_SIZE, Constants::SEPARATOR_RIGHT);
 
-        //if (strcmp(buff, closeTag) == 0) {
         if (strcmp(buffClose, Constants::TH_CLOSE_TAG) == 0 || strcmp(buffClose, Constants::TD_CLOSE_TAG) == 0) {
             ifs.getline(buff, Constants::FIELD_MAX_SIZE, Constants::SEPARATOR_LEFT);
         }
@@ -90,14 +120,11 @@ void Row::parseFields(std::ifstream& ifs, const char* curr, size_t rowIndex, siz
 
 void Row::saveRow(std::ofstream& ofs, size_t currentRowIndex, size_t colsCount) const {
     for (size_t i = 0; i < colsCount; i++) {
-        //if (rows[currentRowIndex].headers[i]) {
         if (headers[i]) {
-            //ofs << "   <th>" << rows[currentRowIndex].fields[i] << "</th>";
             ofs << "   <th>" << fields[i] << "</th>";
             ofs << std::endl;
         }
         else {
-            //ofs << "   <td>" << rows[currentRowIndex].fields[i] << "</td>";
             ofs << "   <td>" << fields[i] << "</td>";
             ofs << std::endl;
         }
@@ -136,18 +163,25 @@ size_t HTML_table::getRowsCount() const {
     return rowsCount;
 }
 size_t HTML_table::getColsCount() const {
-    return rowsCount;
+    return colsCount;
 }
 
-size_t HTML_table::getLongestFieldLength() const {
+size_t HTML_table::getLongestFieldOnColLength(size_t currCol) const {
     size_t max = 0;
     size_t current = 0;
-    for (size_t i = 0; i < rowsCount; i++) {
+
+    /*for (size_t i = 0; i < rowsCount; i++) {
         for (size_t j = 0; j < colsCount; j++) {
             current = strlen(rows[i].fields[j]);
             if (current > max) {
                 max = current;
             }
+        }
+    }*/
+    for (size_t i = 0; i < getRowsCount(); i++) {
+        current = strlen(rows[i].fields[currCol]);
+        if (current > max) {
+            max = current;
         }
     }
     return max;
@@ -160,8 +194,11 @@ void HTML_table::swapRows(Row& first, Row& sec) {
 }
 
 void HTML_table::shiftRows(size_t startIndex) {
-    for (size_t i = rowsCount - 2; i >= startIndex; i--) {
+    for (size_t i = getRowsCount() - 2; i >= startIndex; i--) {
         swapRows(rows[i + 1], rows[i]);
+        if (i == 0) {
+            break;
+        }
     }
 }
 
@@ -173,15 +210,16 @@ void HTML_table::printOffsets(size_t offset) const {
 
 void HTML_table::parseRows(std::ifstream& ifs, size_t& rowIndex) {
 
-    char buff[Constants::FIELD_MAX_SIZE];
+    char buff[Constants::FIELD_MAX_SIZE + 1];
+    buff[Constants::FIELD_MAX_SIZE] = '\0';
 
     size_t cols = 0;
     size_t maxCols = 0;
 
-
     size_t currPos = 0;
 
-    char closeTag[Constants::FIELD_MAX_SIZE];
+    char closeTag[Constants::FIELD_MAX_SIZE + 1];
+    closeTag[Constants::FIELD_MAX_SIZE] = '\0';
 
     while (!ifs.eof()) {
 
@@ -198,19 +236,20 @@ void HTML_table::parseRows(std::ifstream& ifs, size_t& rowIndex) {
             break;
         }
 
-        //parseFields(ifs, buff, rowIndex, cols, closeTag);
         rows[rowIndex].parseFields(ifs, buff, rowIndex, cols, closeTag);
 
         rowIndex++;
         if (cols > maxCols) {
             maxCols = cols;
         }
+
         cols = 0;
+
         ifs.getline(buff, Constants::FIELD_MAX_SIZE, '<');
         ifs.getline(buff, Constants::FIELD_MAX_SIZE, '>');
 
     }
-    colsCount = maxCols;
+    setColsCount(maxCols);
 }
 
 void HTML_table::parseTable(const char* fileName) {
@@ -233,6 +272,7 @@ void HTML_table::parseTable(const char* fileName) {
 
     parseRows(ifs, rowsCount);
 
+    ifs.close();
 }
 
 void HTML_table::serializeTable(const char* fileName) const {
@@ -246,29 +286,43 @@ void HTML_table::serializeTable(const char* fileName) const {
     }
 
     ofs << "<table>" << std::endl;
-    for (size_t i = 0; i < rowsCount; i++) {
+    for (size_t i = 0; i < getRowsCount(); i++) {
+
         ofs << " <tr>" << std::endl;
-        //saveRow(ofs, i, getColsCount());
+
         rows[i].saveRow(ofs, i, getColsCount());
+
         ofs << " </tr>" << std::endl;
     }
+
     ofs << "</table>" << std::endl;
+
+    ofs.close();
 }
 
-void HTML_table::add(size_t rowNumber, const Row& toAdd) {
-    if (rowNumber > rowsCount) {
+void HTML_table::add(size_t rowNumber, const Row& toAdd) { ////////////////////////NOT WORKING PROPERLY, add a column
+    if (rowNumber > getRowsCount()) {
         return;
     }
-    rowsCount++;
-    shiftRows(rowNumber - 1);
+
+    setRowsCount(getRowsCount() + 1);
+   
+    if (rowNumber > 1) {
+        shiftRows(rowNumber - 1);
+    }
+    else if (rowNumber == 1) {
+        shiftRows(rowNumber - 1);
+    }
+    
     rows[rowNumber - 1] = toAdd;
 }
-void HTML_table::remove(size_t rowNumber) {
-    if (rowNumber > rowsCount) {
+
+void HTML_table::remove(size_t rowNumber) { ////////also not working, delete a column
+    if (rowNumber > getRowsCount()) {
         return;
     }
 
-    swapRows(rows[rowNumber - 1], rows[rowsCount - 1]);
+    swapRows(rows[rowNumber - 1], rows[getRowsCount() - 1]);
     rowsCount--;
 }
 void HTML_table::edit(size_t rowNumber, size_t colNumber, const char* newValue) {
@@ -279,20 +333,19 @@ void HTML_table::edit(size_t rowNumber, size_t colNumber, const char* newValue) 
     strcpy(rows[rowNumber - 1].fields[colNumber - 1], newValue);
 }
 void HTML_table::print()  const {
-    size_t setwVal = getLongestFieldLength();
+
+    size_t setwVal = 0;
 
     size_t offset = 0;
     size_t currFieldLen = 0;
 
-    setwVal += 2;
+    for (size_t i = 0; i < getRowsCount(); ++i) {
+        for (size_t j = 0; j < getColsCount(); ++j) {
 
-    /*size_t rows = getRowsCount();
-    size_t cols = getColsCount();*/
-
-    for (size_t i = 0; i < rowsCount; ++i) {
-        for (size_t j = 0; j < colsCount; ++j) {
+            setwVal = getLongestFieldOnColLength(j) + 2;
 
             currFieldLen = strlen(rows[i].fields[j]);
+
             offset = setwVal - currFieldLen;
 
             if (rows[i].headers[j]) {
