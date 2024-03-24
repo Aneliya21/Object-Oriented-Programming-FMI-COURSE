@@ -35,7 +35,7 @@ int main() {
             size_t index = 0;
             std::cin >> index;
 
-            while (index<0 || index>t.getRowsCount()) {
+            while (index < 0 || index > t.getRowsCount()) {
                 std::cout << "Invalid index" << std::endl << "Try again" << std::endl;
                 std::cin >> index;
                 std::cout << std::endl;
@@ -47,6 +47,10 @@ int main() {
             size_t count = 0;
             std::cin >> count;
             std::cout << std::endl;
+
+            if (count > t.getColsCount()) {
+                t.setColsCount(count);
+            }
 
             while (count > t.getColsCount()) {
                 std::cout << "Invalid fields count" << std::endl << "Try again" << std::endl;
@@ -76,10 +80,10 @@ int main() {
                 std::cout << std::endl;
 
                 if (strcmp(headerAns, "yes") == 0) {
-                    toAdd.headers[i] = true;
+                    toAdd.setHeaderAtIndex(i, true);
                 }
                 else if (strcmp(headerAns, "no") == 0) {
-                    toAdd.headers[i] = false;
+                    toAdd.setHeaderAtIndex(i, false);
                 }
                 else {
                     while (strcmp(headerAns, "yes") != 0 || strcmp(headerAns, "no") != 0) {
@@ -88,8 +92,7 @@ int main() {
                         std::cout << std::endl;
                     }
                 }
-
-                strcpy(toAdd.fields[i], field);
+                toAdd.setFieldAtIndex(i, field);
             }
 
             t.add(index, toAdd);
