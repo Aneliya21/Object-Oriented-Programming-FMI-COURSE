@@ -4,7 +4,7 @@ void Nvector::copyFrom(const Nvector& other) {
 	vector = new int[other.size];
 	size = other.size;
 
-	for (size_t i = 0; i, size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		vector[i] = other.vector[i];
 	}
 }
@@ -16,7 +16,7 @@ void Nvector::free() {
 }
 
 Nvector::Nvector(size_t size) {
-	vector = new int[size];
+	vector = new int[size] {0};
 	this->size = size;
 }
 Nvector::Nvector(const Nvector& other) {
@@ -33,52 +33,21 @@ Nvector::~Nvector() {
 	free();
 }
 
-size_t Nvector::getSize() const {
-	return size;
-}
-
-void Nvector::setSize(size_t size) {
-	this->size = size;
-}
-
-int Nvector::getElementFromVector(size_t index) {
-	if (index > 0 && index < size) {
-		return vector[index];
-	}
-	return -1;
-}
-
 Nvector operator+(const Nvector& lhs, const Nvector& rhs) {
-	if (lhs.getSize() == rhs.getSize()) {
-		Nvector result(lhs.getSize());
+	Nvector result(lhs);
+	result += rhs;
 
-		for (size_t i = 0; i < result.getSize(); i++) {
-			result.vector[i] = lhs.vector[i] + rhs.vector[i];
-		}
-
-		return result;
-	}
-	else {
-		return Nvector();
-	}
+	return result;
 }
 Nvector operator-(const Nvector& lhs, const Nvector& rhs) {
-	if (lhs.getSize() == rhs.getSize()) {
-		Nvector result(lhs.getSize());
+	Nvector result(lhs);
+	result -= rhs;
 
-		for (size_t i = 0; i < result.getSize(); i++) {
-			result.vector[i] = lhs.vector[i] - rhs.vector[i];
-		}
-
-		return result;
-	}
-	else {
-		return Nvector();
-	}
+	return result;
 }
 
 Nvector& Nvector::operator+=(const Nvector& other) {
-	if (size == other.getSize()) {
+	if (size == other.size) {
 		for (size_t i = 0; i < size; i++) {
 			vector[i] += other.vector[i];
 		}
@@ -86,7 +55,7 @@ Nvector& Nvector::operator+=(const Nvector& other) {
 	return *this;
 }
 Nvector& Nvector::operator-=(const Nvector& other) {
-	if (size == other.getSize()) {
+	if (size == other.size) {
 		for (size_t i = 0; i < size; i++) {
 			vector[i] -= other.vector[i];
 		}
@@ -95,13 +64,13 @@ Nvector& Nvector::operator-=(const Nvector& other) {
 }
 
 Nvector operator*(const Nvector& vector, size_t scalar) {
-	Nvector result(vector.getSize());
-
-	for (size_t i = 0; i < result.getSize(); i++) {
-		result.vector[i] = vector.vector[i] * scalar;
-	}
+	Nvector result(vector);
+	result *= scalar;
 
 	return result;
+}
+Nvector operator*(size_t scalar, const Nvector& vector) {
+	return vector * scalar;
 }
 Nvector& Nvector::operator*=(size_t scalar) {
 	for (size_t i = 0; i < size; i++) {
@@ -111,21 +80,21 @@ Nvector& Nvector::operator*=(size_t scalar) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Nvector& vect) {
-	for (size_t i = 0; i < vect.getSize(); i++) {
-		os << vect.vector[i] << " ";
+	for (size_t i = 0; i < vect.size; i++) {
+		os << vect[i] << " ";
 	}
 	return os;
 }
 std::istream& operator>>(std::istream& is, Nvector& vect) {
-	for (size_t i = 0; i < vect.getSize(); i++) {
-		is >> vect.vector[i];
+	for (size_t i = 0; i < vect.size; i++) {
+		is >> vect[i];
 	}
 	return is;
 }
 
-bool Nvector::operator|=(const Nvector& other) const {
-
+int& Nvector::operator[](size_t index) {
+	return vector[index];
 }
-bool Nvector::operator|(const Nvector& other) const {
-
+int Nvector::operator[](size_t index) const {
+	return vector[index];
 }
