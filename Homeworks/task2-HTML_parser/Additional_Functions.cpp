@@ -9,11 +9,12 @@ bool AdditionalFunciotns::isDigit(char ch) {
     return ch >= '0' && ch <= '9';
 }
 
-char* AdditionalFunciotns::handleHTMLcodes(const char* str) {
+//there is a problem with the function
+char* AdditionalFunciotns::handleHTMLcodes(const char* str) { 
     if (!str) {
         return nullptr;
     }
-    char result[Constants::FIELD_MAX_SIZE + 1];
+    char result[Constants::FIELD_MAX_SIZE + 1]; //this should be a dynamic char* because the func returns char* !!!
     size_t strLength = strlen(str);
     result[strLength - 1] = '\0';
 

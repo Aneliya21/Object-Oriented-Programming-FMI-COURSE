@@ -1,7 +1,8 @@
 #include "Song.h"
 
+//there is a problem with this function
 char* Song::getGenreString() const {
-    char result[Constants::MAX_NAME_LEN + 1] = "";
+    char result[Constants::MAX_NAME_LEN + 1] = ""; //the result string should be a pointer to the heap because the function returns char* !!!
     result[Constants::MAX_NAME_LEN] = '\0';
 
     size_t resultLen = 0;
