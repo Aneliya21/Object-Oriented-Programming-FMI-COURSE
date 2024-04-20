@@ -4,15 +4,6 @@
 
 #include "MultisetConstants.h"
 
-//SOURCES: https://github.com/desiish/OOP_Pract_2023_2024/blob/main/Pract06/Multiset/Multiset.cpp
-//         KAMELIA TODOROVA, GROUP 4, COURSE 2 and ROSITSA ILIEVA, GROUP 4, COURSE 2
-
-
-//ostava da napravq:
-//	da probvam da opravq printInMemory
-//	testove na vsichko
-//  razlika!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 class Multiset {
 private:
 	uint8_t* buckets = nullptr;
