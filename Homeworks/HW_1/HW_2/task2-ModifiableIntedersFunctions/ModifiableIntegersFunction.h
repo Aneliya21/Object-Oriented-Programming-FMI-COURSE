@@ -2,9 +2,6 @@
 
 #include "Constants.h"
 
-//SOURCES: https://github.com/Justsvetoslavov/Object-oriented_programming_FMI/blob/master/Seminars/Utils/Exam/Task02/ModifiableNaturalNumbersFunction.hpp
-//         Yoanna Mateva, IS, Course 1 and ChatGPT 3.5 for operator|| and drawFunc()
-
 class ModifiableIntegersFunction {
 
 private:
@@ -65,12 +62,18 @@ public:
 
     //comparing operators (they use private member - functions from the class, that is why they are friend - functions)
     friend bool operator<(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
+
+    //operator> uses operator< and there is no need to be a friend function for the class, but i made it friend because of the style of the code (to be next to the other cmp operators)
     friend bool operator>(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
 
     friend bool operator<=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
+
+    //operator>= uses operator<= and there is no need to be a friend function for the class, but i made it friend because of the style of the code (to be next to the other cmp operators)
     friend bool operator>=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
 
     friend bool operator==(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
+
+    //operator!= uses operator== and there is no need to be a friend function for the class, but i made it friend because of the style of the code (to be next to the other cmp operators)
     friend bool operator!=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs);
 
     //predefined operator|| for checking if two function are parallel (it also uses private member - funcitons)
@@ -103,8 +106,7 @@ public:
     //this one is used in the public member - function isInection()
     bool checkForInectionAtIndex(int index) const;
 
-    //this one is used in the public member - function drawFunc(), it calclulated the derivativa at given point
-    int16_t findDerivativeAtPoint(int16_t point) const;
+    //int16_t findDerivativeAtPoint(int16_t point) const;
 };
 
 //these use the already predefined operators += and -= (no need to be friend functions for the class)

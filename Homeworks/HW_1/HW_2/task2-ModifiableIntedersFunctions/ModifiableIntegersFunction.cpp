@@ -3,19 +3,19 @@
 
 void ModifiableIntegersFunction::copyFrom(const ModifiableIntegersFunction& other) {
     modifiable_IntFunctions = new Function[ModifIntFuncsConstants::ARRAY_SIZE];
-    //copy data
+
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
         int arrInd = getIndexInArray(i);
         modifiable_IntFunctions[arrInd] = other.modifiable_IntFunctions[arrInd];
     }
 }
 void ModifiableIntegersFunction::moveFrom(ModifiableIntegersFunction&& other) {
-    modifiable_IntFunctions = other.modifiable_IntFunctions; //"steal data"
+    modifiable_IntFunctions = other.modifiable_IntFunctions;
     other.modifiable_IntFunctions = nullptr;
 }
 void ModifiableIntegersFunction::free() {
     delete[] modifiable_IntFunctions;
-    modifiable_IntFunctions = nullptr; //giving it def value
+    modifiable_IntFunctions = nullptr;
 }
 
 int ModifiableIntegersFunction::countOfExcludedPoints() const {
@@ -67,19 +67,18 @@ bool ModifiableIntegersFunction::checkForInectionAtIndex(int index) const {
     return true;
 }
 
-int16_t ModifiableIntegersFunction::findDerivativeAtPoint(int16_t point) const {
-    double h = 0.0001;  // Step size for numerical differentiation
+//int16_t ModifiableIntegersFunction::findDerivativeAtPoint(int16_t point) const {
+//    double h = 0.0001;  // Step size for numerical differentiation
+//
+//    int16_t val = getVal(point - ModifIntFuncsConstants::MIN + h);
+//    int16_t val2 = getVal(point - ModifIntFuncsConstants::MIN);
+//
+//    return (int16_t)((val - val2) / h);
+//
+//    //return (int16_t)((func(point + h) - func(point)) / h);
+//}
 
-    int16_t val = getVal(point - ModifIntFuncsConstants::MIN + h);
-    int16_t val2 = getVal(point - ModifIntFuncsConstants::MIN);
 
-    return (int16_t)((val - val2) / h);
-
-    //return (int16_t)((func(point + h) - func(point)) / h);
-}
-
-
-//tiq sa qsni
 ModifiableIntegersFunction::ModifiableIntegersFunction(int16_t(*pred)(int16_t)) {
     modifiable_IntFunctions = new Function[ModifIntFuncsConstants::ARRAY_SIZE];
 
@@ -121,7 +120,7 @@ ModifiableIntegersFunction::~ModifiableIntegersFunction() {
 
 void ModifiableIntegersFunction::setOutputForInput(int16_t point, int16_t value) {
     int index = getIndexInArray(point);
-    //setPoint(index, point);
+
     setVal(index, value);
     setIsDef(index, true);
 }
@@ -132,27 +131,10 @@ void ModifiableIntegersFunction::excludePoint(int16_t point) {
 }
 
 ModifiableIntegersFunction& ModifiableIntegersFunction::operator+=(const ModifiableIntegersFunction& other) {
-    bool isThisDef = true;
-    bool isOtherDef = true;
-
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
-        /*try {
-            if (isDef(i) == false || other.isDef(i) == false) {
-                setIsDef(i-ModifIntFuncsConstants::MIN, false);
-            }
-        }
-        catch (const std::exception& ex) {
-            std::cout << ex.what() << i << std::endl;
-        }
 
-        try {
-            if ((isDef(i) == true) && (other.isDef(i) == true)) {
-                setOutputForInput(i, (*this)(i) + other(i));
-            }
-        }
-        catch (const std::exception& ex) {
-            std::cout << ex.what() << i << std::endl;
-        }*/
+        bool isThisDef = true;
+        bool isOtherDef = true;
         try {
             isThisDef = isDef(i);
         }
@@ -179,11 +161,9 @@ ModifiableIntegersFunction& ModifiableIntegersFunction::operator+=(const Modifia
     return *this;
 }
 ModifiableIntegersFunction& ModifiableIntegersFunction::operator-=(const ModifiableIntegersFunction& other) {
-    bool isThisDef = true;
-    bool isOtherDef = true;
-
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
-
+        bool isThisDef = true;
+        bool isOtherDef = true;
         try {
             isThisDef = isDef(i);
         }
@@ -211,13 +191,15 @@ ModifiableIntegersFunction& ModifiableIntegersFunction::operator-=(const Modifia
 
 ModifiableIntegersFunction& ModifiableIntegersFunction::operator()(const ModifiableIntegersFunction& other) {
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; ++i) {
+        try {
+            if (isDef(i) && other.isDef((*this)(i))) {
 
-        if (isDef(i) && other.isDef((*this)(i))) {
-
-            int16_t result = (*this)(other(i));
-            setOutputForInput(i, result);
+                int16_t result = (*this)(other(i));
+                setOutputForInput(i, result);
+            }
         }
-        else {
+        catch (const std::exception& ex) {   
+            std::cout << ex.what() << i << std::endl;
             setIsDef(i - ModifIntFuncsConstants::MIN, false);
         }
     }
@@ -228,39 +210,19 @@ int16_t ModifiableIntegersFunction::operator()(int16_t x) const {
     return getVal(index);
 }
 
-//tva pak da se testva
 ModifiableIntegersFunction& ModifiableIntegersFunction::operator^=(unsigned k) {
-    /*bool isCurrentDefined = true;
-
-    for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
-        try {
-            isCurrentDefined = isDef(i);
-        }
-        catch (const std::exception& ex) {
-            std::cout << ex.what() << i << std::endl;
-        }
-
-        if (isCurrentDefined == true) {
-            int16_t currentValue = (*this)(i);
-
-            for (unsigned times = 1; times < k; times++) {
-                currentValue = func(currentValue);
-            }
-            setOutputForInput(i, currentValue);
-        }
-    }
-    return *this;*/
     if (k <= 1) {
         return *this;
     }
-    bool isCurrentDef = true;
 
     for (int i = ModifIntFuncsConstants::MIN; i < ModifIntFuncsConstants::MAX; i++) {
+        bool isCurrentDef = true;
         try {
             isCurrentDef = isDef(i);
         }
         catch (const std::exception& ex) {
-            
+            std::cout << ex.what() << i << std::endl;
+            isCurrentDef = false;
         }
         if (isCurrentDef == true) {
             int16_t currVal = getVal(i - ModifIntFuncsConstants::MIN);
@@ -275,12 +237,11 @@ ModifiableIntegersFunction& ModifiableIntegersFunction::operator^=(unsigned k) {
     return *this;
 }
 
-//i tva da se testva
 ModifiableIntegersFunction& ModifiableIntegersFunction::inverse() {
 
-   /*if (isBiection() == false) {
+   if (isBiection() == false) {
             return *this;
-   }*/
+   }
    ModifiableIntegersFunction inverseFunc(*this);
    
    for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
@@ -349,8 +310,10 @@ void ModifiableIntegersFunction::readFromBinaryFile(const char* fileName) {
 }
 
 void ModifiableIntegersFunction::drawFunc() const {
-    for (int y = ModifIntFuncsConstants::PLANE_SIZE; y >= -ModifIntFuncsConstants::PLANE_SIZE; --y) {
-        for (int x = -ModifIntFuncsConstants::PLANE_SIZE; x <= ModifIntFuncsConstants::PLANE_SIZE; ++x) {
+    for (int y = ModifIntFuncsConstants::PLANE_SIZE; y >= -ModifIntFuncsConstants::PLANE_SIZE; y--) {
+
+        for (int x = -ModifIntFuncsConstants::PLANE_SIZE; x <= ModifIntFuncsConstants::PLANE_SIZE; x++) {
+
             char toPrint = ModifIntFuncsConstants::EMPTY_CHAR;
             int16_t result = (*this)((int16_t)(x));
 
@@ -414,15 +377,17 @@ bool operator<(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFu
     if (countOfExcludedInLhs != countOfExcludedInRhs) {
         return countOfExcludedInLhs > countOfExcludedInRhs;
     }
-    bool isLhsDef = true;
-    bool isRhsDef = true;
 
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
+        bool isLhsDef = true;
+        bool isRhsDef = true;
+
         try {
             isLhsDef = lhs.isDef(i);
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            isLhsDef = false;
         }
 
         try {
@@ -430,6 +395,7 @@ bool operator<(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFu
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            isRhsDef = false;
         }
 
         if (isLhsDef == true && isRhsDef == true) {
@@ -451,21 +417,24 @@ bool operator<=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersF
     if (countOfExcludedInLhs != countOfExcludedInRhs) {
         return (countOfExcludedInLhs > countOfExcludedInRhs);
     }
-    bool isLhsDef = true;
-    bool isRhsDef = true;
 
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {     
+        bool isLhsDef = true;
+        bool isRhsDef = true;
+
         try {
             isLhsDef = lhs.isDef(i);
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            isLhsDef = false;
         }
         try {
             isRhsDef = rhs.isDef(i);
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            isRhsDef = false;
         }
 
         if (isLhsDef == true && isRhsDef == true) {
@@ -481,24 +450,23 @@ bool operator>=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersF
 }
 
 bool operator==(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs) {
-    int16_t lhsRes = 0;
-    int16_t rhsRes = 0;
-
-    bool lhsDef = true;
-    bool rhsDef = true;
-
     for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
+        bool lhsDef = true;
+        bool rhsDef = true;
+
         try {
             lhsDef = lhs.isDef(i);
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            lhsDef = false;
         }
         try {
             rhsDef = rhs.isDef(i);
         }
         catch (const std::exception& ex) {
             std::cout << ex.what() << i << std::endl;
+            rhsDef = false;
         }
 
         if ((lhsDef == true) && (rhsDef == true)) {
@@ -520,19 +488,66 @@ bool operator!=(const ModifiableIntegersFunction& lhs, const ModifiableIntegersF
     return !(lhs == rhs);
 }
 
-//tva tr se testva
 bool operator||(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs) {
-    double tolerance = 0.0001;  // Tolerance for comparing slopes
 
-    // Check for parallelism over the specified range
-    for (int point = ModifIntFuncsConstants::MIN; point <= ModifIntFuncsConstants::MAX; point++) {
-        int16_t slope1 = lhs.findDerivativeAtPoint(point);
-        int16_t slope2 = rhs.findDerivativeAtPoint(point);
+    //double tolerance = 0.0001;  // Tolerance for comparing slopes
+    //// Check for parallelism over the specified range
+    //for (int point = ModifIntFuncsConstants::MIN; point <= ModifIntFuncsConstants::MAX; point++) {
+    //    int16_t slope1 = lhs.findDerivativeAtPoint(point);
+    //    int16_t slope2 = rhs.findDerivativeAtPoint(point);
+    //    // Compare the slopes with a tolerance
+    //    if (std::abs(slope1 - slope2) > tolerance) {
+    //        return false;
+    //    }
+    //}
+    //return true;
 
-        // Compare the slopes with a tolerance
-        if (std::abs(slope1 - slope2) > tolerance) {
+    int16_t currentDiff = 0;
+    int16_t nextDiff = 0;
+
+    bool isDiffCalculated = false;
+    int initialDiff = 0;
+
+    for (int i = ModifIntFuncsConstants::MIN; i <= ModifIntFuncsConstants::MAX; i++) {
+        bool isLhsDef = true;
+        bool isRhsDef = true;
+        try {
+            isLhsDef = lhs.isDef(i);
+        }
+        catch (const std::exception& ex) {
+            std::cout << ex.what() << std::endl;
+            isLhsDef = false;
+        }
+        try {
+            isRhsDef = rhs.isDef(i);
+        }
+        catch (const std::exception& ex) {
+            std::cout << ex.what() << std::endl;
+            isRhsDef = false;
+        }
+        if ((isLhsDef == false) && (isRhsDef == false)) {
+            continue;
+        }
+        else if ((isLhsDef == false) && (isRhsDef == true)) {
             return false;
         }
+        else if ((isLhsDef == true) && (isRhsDef == false)) {
+            return false;
+        }
+        if (i == ModifIntFuncsConstants::MIN) {
+            if ((isLhsDef == true) && (isRhsDef == true)) {
+                initialDiff = std::abs(lhs(i) - rhs(i));
+                isDiffCalculated = true;
+                continue;
+            }
+        }
+        if ((isLhsDef == true) && (isRhsDef == true)) {
+            int currDiff = std::abs(lhs(i) - rhs(i));
+            if (currDiff != initialDiff) {
+                return false;
+            }
+        }
+
     }
     return true;
 }
