@@ -364,7 +364,7 @@ ModifiableIntegersFunction operator+(const ModifiableIntegersFunction& lhs, cons
 }
 ModifiableIntegersFunction operator-(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs) {
     ModifiableIntegersFunction result(lhs);
-    result += rhs;
+    result -= rhs;
 
     return result;
 }
