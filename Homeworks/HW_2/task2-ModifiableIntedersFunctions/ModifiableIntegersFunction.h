@@ -80,7 +80,7 @@ public:
     friend bool operator||(const ModifiableIntegersFunction& lhs, const ModifiableIntegersFunction& rhs); 
 
 
-public:
+private:
     //for the BIG 6
     void copyFrom(const ModifiableIntegersFunction& other);
     void moveFrom(ModifiableIntegersFunction&& other);
