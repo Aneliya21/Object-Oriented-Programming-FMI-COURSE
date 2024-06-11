@@ -53,6 +53,7 @@ void Employee::setName(const char* newName) {
 	if (!newName) {
 		return;
 	}
+	delete[] name;
 	name = new char[strlen(newName) + 1];
 	strcpy(name, newName);
 }
